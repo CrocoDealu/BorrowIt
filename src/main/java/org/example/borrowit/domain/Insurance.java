@@ -1,36 +1,37 @@
 package org.example.borrowit.domain;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @jakarta.persistence.Entity
 @Table(name = "Insurances")
 public class Insurance extends Entity<Integer> {
-    @OneToOne
-    @JoinColumn(name = "rental_id", nullable = false)
-    private Rental rental;
-
     @Column(name = "covered_amount", nullable = false)
     private double coveredAmount;
+
+    @ManyToMany
+    @JoinTable(
+            name = "insured_items", // Join table name
+            joinColumns = @JoinColumn(name = "insurance_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<Item> items = new ArrayList<>();
+
 
     public Insurance() {
     }
 
-    public Insurance(Integer integer, Rental rental, double coveredAmount) {
+    public Insurance(Integer integer, List<Item> items, double coveredAmount) {
         super(integer);
-        this.rental = rental;
+        this.items = items;
         this.coveredAmount = coveredAmount;
     }
 
-    public Rental getRental() {
-        return rental;
-    }
-
-    public void setRental(Rental rental) {
-        this.rental = rental;
+    public List<Item> getItems() {
+        return items;
     }
 
     public double getCoveredAmount() {
