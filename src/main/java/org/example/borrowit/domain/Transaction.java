@@ -2,10 +2,10 @@ package org.example.borrowit.domain;
 
 import org.example.borrowit.utils.TransactionStatus;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @Table(name = "Transactions")
 public class Transaction extends Entity<Integer> {
 

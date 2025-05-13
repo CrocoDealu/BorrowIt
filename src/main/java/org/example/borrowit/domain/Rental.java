@@ -1,11 +1,11 @@
 package org.example.borrowit.domain;
 
+import jakarta.persistence.*;
 import org.example.borrowit.utils.RentalStatus;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @Table(name = "Rentals")
 public class Rental extends Entity<Integer> {
 
@@ -34,6 +34,10 @@ public class Rental extends Entity<Integer> {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+    }
+
+    public Rental() {
+
     }
 
     public Item getItem() {

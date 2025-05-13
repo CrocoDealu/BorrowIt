@@ -1,7 +1,6 @@
 package org.example.borrowit.domain;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public class Person extends Entity<Integer> {

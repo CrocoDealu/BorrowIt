@@ -1,10 +1,8 @@
 package org.example.borrowit.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.*;
 
-@Entity
+@jakarta.persistence.Entity
 @Table(name = "Users")
 public class User extends Person {
 

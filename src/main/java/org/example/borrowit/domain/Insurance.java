@@ -1,10 +1,12 @@
 package org.example.borrowit.domain;
 
 
-import javax.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
-
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @Table(name = "Insurances")
 public class Insurance extends Entity<Integer> {
     @OneToOne

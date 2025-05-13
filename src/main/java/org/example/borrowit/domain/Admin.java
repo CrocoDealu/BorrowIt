@@ -1,8 +1,7 @@
 package org.example.borrowit.domain;
 
-import javax.persistence.Entity;
 
-@Entity
+@jakarta.persistence.Entity
 public class Admin extends Person {
 
     public Admin() {

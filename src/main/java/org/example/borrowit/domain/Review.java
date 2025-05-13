@@ -1,9 +1,9 @@
 package org.example.borrowit.domain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @Table(name = "Reviews")
 public class Review extends Entity<Integer> {
 

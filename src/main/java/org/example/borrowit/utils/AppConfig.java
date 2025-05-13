@@ -16,7 +16,7 @@ public class AppConfig {
     }
 
     @Bean
-    public UserDbRepository userDbRepository(SessionFactory sessionFactory) {
+    public UserRepository userRepository(SessionFactory sessionFactory) {
         return new UserDbRepository(sessionFactory);
     }
 }

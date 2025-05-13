@@ -3,10 +3,10 @@ package org.example.borrowit.domain;
 import org.example.borrowit.utils.ItemCategory;
 import org.example.borrowit.utils.ItemCondition;
 import org.example.borrowit.utils.ItemStatus;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
-@javax.persistence.Entity
+@jakarta.persistence.Entity
 @Table(name = "Items")
 public class Item extends Entity<Integer> {
 
@@ -54,6 +54,9 @@ public class Item extends Entity<Integer> {
         this.location = location;
         this.status = status;
         this.owner = owner;
+    }
+
+    public Item() {
     }
 
     public String getTitle() {
