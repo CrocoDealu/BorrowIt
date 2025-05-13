@@ -8,6 +8,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ItemDbRepository implements ItemRepository {
@@ -112,5 +113,23 @@ public class ItemDbRepository implements ItemRepository {
 
     public Session getSession() {
         return sessionFactory.openSession();
+    }
+
+    @Override
+    public Iterable<Item> findByUserId(Integer userId) {
+        logger.info("Finding items by user id: {}", userId);
+        String hql = "from Item i where i.owner.id = :userId";
+        List<Item> items;
+
+        try (Session session = getSession()) {
+            items = session.createQuery(hql, Item.class)
+                    .setParameter("userId", userId)
+                    .getResultList();
+        } catch (Exception e) {
+            logger.error(e);
+            throw new RuntimeException("Error finding items by user id: " + userId);
+        }
+
+        return items;
     }
 }
