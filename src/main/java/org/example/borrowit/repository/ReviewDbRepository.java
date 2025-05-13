@@ -7,14 +7,18 @@ import org.example.borrowit.domain.Review;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
+@Repository
 public class ReviewDbRepository implements ReviewRepository {
     private final SessionFactory sessionFactory;
     private static final Logger logger = LogManager.getLogger(ReviewDbRepository.class);
 
+    @Autowired
     public ReviewDbRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

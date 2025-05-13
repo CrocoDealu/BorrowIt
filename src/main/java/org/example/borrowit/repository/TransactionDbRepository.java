@@ -5,13 +5,17 @@ import org.apache.logging.log4j.Logger;
 import org.example.borrowit.domain.Transaction;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public class TransactionDbRepository implements TransactionRepository {
     private static final Logger logger = LogManager.getLogger(TransactionDbRepository.class);
     private final SessionFactory sessionFactory;
 
+    @Autowired
     public TransactionDbRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

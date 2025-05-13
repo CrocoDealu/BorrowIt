@@ -10,12 +10,6 @@
         <property name="hibernate.connection.password">postgres</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
-        <!-- Hibernate settings -->
-        <property name="hibernate.show_sql">true</property>
-        <property name="hibernate.format_sql">true</property>
-        <property name="hibernate.hbm2ddl.auto">update</property>
-
-        <!-- Mapped entity classes -->
         <mapping class="org.example.borrowit.domain.User" />
         <mapping class="org.example.borrowit.domain.Admin" />
         <mapping class="org.example.borrowit.domain.Review" />

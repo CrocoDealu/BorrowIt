@@ -2,15 +2,18 @@ package org.example.borrowit.service;
 
 import org.example.borrowit.domain.Item;
 import org.example.borrowit.repository.ItemRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+@Service
 public class ItemService {
     private final ItemRepository itemRepository;
 
-
+    @Autowired
     public ItemService(ItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }

@@ -2,15 +2,18 @@ package org.example.borrowit.service;
 
 import org.example.borrowit.domain.Rental;
 import org.example.borrowit.repository.RentalRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
+@Service
 public class RentalService {
     private final RentalRepository rentalRepository;
 
-
+    @Autowired
     public RentalService(RentalRepository rentalRepository) {
         this.rentalRepository = rentalRepository;
     }
@@ -22,7 +25,6 @@ public class RentalService {
     public List<Rental> getRentalsByUserId(int userId) {
         return StreamSupport.stream(rentalRepository.findRentalsByUserId(userId).spliterator(), false).toList();
     }
-
     public Rental addRental(Rental rental) {
         return rentalRepository.save(rental);
     }

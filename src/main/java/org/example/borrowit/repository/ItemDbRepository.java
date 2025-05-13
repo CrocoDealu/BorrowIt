@@ -7,14 +7,18 @@ import org.example.borrowit.domain.Item;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class ItemDbRepository implements ItemRepository {
     private final SessionFactory sessionFactory;
     private static final Logger logger = LogManager.getLogger(ItemDbRepository.class);
 
+    @Autowired
     public ItemDbRepository(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

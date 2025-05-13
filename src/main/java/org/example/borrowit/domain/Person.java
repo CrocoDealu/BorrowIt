@@ -1,5 +1,6 @@
 package org.example.borrowit.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @MappedSuperclass
@@ -8,6 +9,7 @@ public class Person extends Entity<Integer> {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @JsonIgnore
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
