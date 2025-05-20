@@ -10,6 +10,8 @@
         <property name="hibernate.connection.password">postgres</property>
         <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 
+        <property name="hibernate.hbm2ddl.auto">create</property>
+
         <mapping class="org.example.borrowit.domain.User" />
         <mapping class="org.example.borrowit.domain.Admin" />
         <mapping class="org.example.borrowit.domain.Review" />

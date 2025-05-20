@@ -38,5 +38,5 @@ public class LoginController {
              return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                      .body(Collections.singletonMap("error", "Non existent email"));
          }
-     }
+    }
 }

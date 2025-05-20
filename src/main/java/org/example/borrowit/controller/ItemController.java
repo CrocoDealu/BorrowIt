@@ -2,6 +2,7 @@ package org.example.borrowit.controller;
 
 import org.example.borrowit.domain.Item;
 import org.example.borrowit.service.ItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class ItemController {
     public ResponseEntity<List<Item>> getItemsByUserId(@RequestParam Integer userId) {
         List<Item> items = itemService.getAllItemsForUser(userId);
         if (items.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } else {
             return ResponseEntity.ok(items);
         }

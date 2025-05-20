@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 @Service
 public class ReviewService {
@@ -22,12 +23,16 @@ public class ReviewService {
         return StreamSupport.stream(reviewRepository.findAll().spliterator(), false).toList();
     }
 
-    public List<Review> getReviewsByItemId(Item item) {
-        return StreamSupport.stream(reviewRepository.findByItem(item.getId()).spliterator(), false).toList();
+    public List<Review> getReviewsByItemId(int itemId) {
+        return StreamSupport.stream(reviewRepository.findByItem(itemId).spliterator(), false).toList();
     }
 
-    public List<Review> getReviewsByUserId(User user) {
-        return StreamSupport.stream(reviewRepository.findByUser(user.getId()).spliterator(), false).toList();
+    public List<Review> getReviewsByUserId(int userId) {
+        return StreamSupport.stream(reviewRepository.findByUser(userId).spliterator(), false).toList();
+    }
+
+    public Optional<Review> getReviewById(int id) {
+        return reviewRepository.findById(id);
     }
 
     public Review addReview(Review review) {
