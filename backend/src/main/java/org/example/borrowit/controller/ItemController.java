@@ -18,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/items")
@@ -35,7 +36,60 @@ public class ItemController {
     public ResponseEntity<List<ItemWithImagesDto>> getAllItems() {
         List<Item> items = itemService.getAllItems();
 
-        List<ItemWithImagesDto> itemsWithImages = items.stream()
+        List<ItemWithImagesDto> itemsWithImages = convertToItemDto(items);
+        return ResponseEntity.ok(itemsWithImages);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ItemWithImagesDto> getItemById(@PathVariable Integer id, @RequestHeader("Authorization") String authToken) {
+        if (authToken == null || authToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            ItemWithImagesDto itemWithImagesDto = itemService.getItemById(id)
+                    .map(item -> new ItemWithImagesDto(item, item.getImages().stream()
+                            .map(imagePath -> {
+                                try {
+                                    Path filePath = Paths.get("images/", imagePath);
+                                    return Files.readAllBytes(filePath);
+                                } catch (IOException e) {
+                                    System.err.println("Failed to read image: " + imagePath);
+                                    e.printStackTrace();
+                                    return null;
+                                }
+                            })
+                            .filter(Objects::nonNull)
+                            .map(Base64.getEncoder()::encodeToString)
+                            .collect(Collectors.toList())))
+                    .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
+
+            return ResponseEntity.ok(itemWithImagesDto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            System.err.println("Error retrieving item: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/lent/user")
+    public ResponseEntity<List<ItemWithImagesDto>> getItemsLentByUserId(@RequestHeader("Authorization") String authToken) {
+        if (userService.getUserByToken(authToken) == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = userService.getUserByToken(authToken);
+        List<Item> items = itemService.getAllItemsForUser(user.getId());
+        List<ItemWithImagesDto> itemsWithImages = convertToItemDto(items);
+        if (itemsWithImages.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return ResponseEntity.ok(itemsWithImages);
+        }
+    }
+
+    private List<ItemWithImagesDto> convertToItemDto(List<Item> items) {
+        return items.stream()
                 .map(item -> {
                     List<byte[]> imagesAsBinary = item.getImages().stream()
                             .map(imagePath -> {
@@ -51,31 +105,11 @@ public class ItemController {
                             .filter(Objects::nonNull)
                             .toList();
 
-                    return new ItemWithImagesDto(item, imagesAsBinary);
+                    return new ItemWithImagesDto(item, imagesAsBinary.stream()
+                            .map(Base64.getEncoder()::encodeToString)
+                            .collect(Collectors.toList()));
                 })
                 .toList();
-        return ResponseEntity.ok(itemsWithImages);
-    }
-
-    @GetMapping("/id")
-    public ResponseEntity<Item> getItemById(@RequestParam Integer id) {
-        return itemService.getItemById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/user/token")
-    public ResponseEntity<List<Item>> getItemsByUserId(@RequestParam String authToken) {
-        if (userService.getUserByToken(authToken) == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        User user = userService.getUserByToken(authToken);
-        List<Item> items = itemService.getAllItemsForUser(user.getId());
-        if (items.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return ResponseEntity.ok(items);
-        }
     }
 
     @PostMapping(consumes = "multipart/form-data")
@@ -121,8 +155,11 @@ public class ItemController {
         return images;
     }
 
-    @DeleteMapping("/id")
-    public ResponseEntity<Item> deleteItemById(@RequestParam Integer id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Item> deleteItemById(@PathVariable Integer id, @RequestHeader("Authorization") String token) {
+        if (userService.getUserByToken(token) == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Optional<Item> deletedItem = itemService.deleteItem(id);
         return deletedItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

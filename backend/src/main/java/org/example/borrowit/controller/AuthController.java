@@ -52,7 +52,7 @@ public class AuthController {
         if (newUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CREATED).body("Registration succesful!");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Registration failed!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists!");
         }
     }
 

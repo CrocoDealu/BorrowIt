@@ -1,0 +1,159 @@
+.item-detail-section {
+    padding: 25px;
+}
+
+.item-detail-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    background: white;
+    border-radius: 8px;
+}
+
+.item-detail-image {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.item-detail-image img {
+    width: 100%;
+    border-radius: 8px;
+    object-fit: cover;
+    max-height: 400px;
+}
+
+.item-additional-images {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.additional-image {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.item-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.item-detail-title {
+    font-size: 24px;
+    margin: 0;
+    color: #333;
+}
+
+.item-detail-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.meta-label {
+    font-weight: 600;
+    color: #555;
+    min-width: 80px;
+}
+
+.meta-value {
+    color: #333;
+}
+
+.item-detail-description h4,
+.item-borrowing-conditions h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.item-detail-description p,
+.item-borrowing-conditions p {
+    margin: 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.item-detail-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.back-button {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
+}
+
+.borrow-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.borrow-button:hover {
+    background-color: #3d8b40;
+}
+
+.edit-button {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.edit-button:hover {
+    background-color: #e0a800;
+}
+
+.loading,
+.error-container {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-size: 18px;
+}
+
+.error-container {
+    color: #dc3545;
+}
+
+@media (max-width: 768px) {
+    .item-detail-container {
+        grid-template-columns: 1fr;
+    }
+
+    .item-detail-actions {
+        flex-direction: column;
+    }
+}

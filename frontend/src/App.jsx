@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import AddItem from './pages/AddItem';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import LentItems from "./pages/LentItems.jsx";
+import ViewItem from "./pages/ViewItem.jsx";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -54,8 +56,14 @@ function App() {
                 <Route path="/dashboard" element={
                     isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
                 } />
+                <Route path="/lent-items" element={
+                    isAuthenticated ? <LentItems /> : <Navigate to="/login" />
+                } />
                 <Route path="/add-item" element={
                     isAuthenticated ? <AddItem /> : <Navigate to="/login" />
+                } />
+                <Route path="/view-item/:id" element={
+                    isAuthenticated ? <ViewItem /> : <Navigate to="/login" />
                 } />
                 <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
             </Routes>

@@ -11,12 +11,12 @@ public class ItemWithImagesDto extends Entity<Integer> {
     private String category;
     private String condition;
     private float rentPrice;
-    private List<byte[]> images; // Store binary image data
+    private List<String> images;
     private String location;
     private String status;
     private String owner;
 
-    public ItemWithImagesDto(Item item, List<byte[]> images) {
+    public ItemWithImagesDto(Item item, List<String> images) {
         super(item.getId());
         this.title = item.getTitle();
         this.description = item.getDescription();
@@ -69,11 +69,11 @@ public class ItemWithImagesDto extends Entity<Integer> {
         this.rentPrice = rentPrice;
     }
 
-    public List<byte[]> getImages() {
+    public List<String> getImages() {
         return images;
     }
 
-    public void setImages(List<byte[]> images) {
+    public void setImages(List<String> images) {
         this.images = images;
     }
 

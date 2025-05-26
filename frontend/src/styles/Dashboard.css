@@ -172,6 +172,20 @@
     color: #555;
 }
 
+.item-owner {
+    font-size: 14px;
+    color: #777;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.item-owner span {
+    font-weight: 500;
+    color: #4a90e2;
+    margin-left: 4px;
+}
+
 @media (max-width: 768px) {
     .dashboard-header {
         flex-direction: column;

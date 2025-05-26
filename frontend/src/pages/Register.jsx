@@ -84,10 +84,8 @@ const Register = () => {
                     address: formData.address
                 };
 
-                // Adjust the endpoint based on your backend API
                 const response = await axios.post('/auth/register', registrationData);
 
-                // Handle success - typically store token and redirect
                 if (response.data && response.data.token) {
                     localStorage.setItem('authToken', response.data.token);
                     if (response.data.user) {
@@ -95,12 +93,12 @@ const Register = () => {
                     }
                     navigate('/dashboard');
                 } else {
-                    // If registration is successful but requires email verification
                     navigate('/login', { state: { message: 'Registration successful! Please check your email to verify your account.' } });
                 }
             } catch (err) {
                 if (err.response && err.response.data) {
-                    setApiError(err.response.data.error || 'Registration failed. Please try again.');
+                    console.log(err.response.data);
+                    setApiError(err.response.data || 'Registration failed. Please try again.');
                 } else {
                     setApiError('An error occurred during registration. Please try again later.');
                 }

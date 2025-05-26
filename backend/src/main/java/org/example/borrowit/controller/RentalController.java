@@ -26,8 +26,9 @@ public class RentalController {
         return ResponseEntity.ok().body(rentalService.getAllRentals());
     }
 
-    @GetMapping("/user/id")
-    public ResponseEntity<List<Rental>> getRentalsByUserId(Integer userId) {
+    @GetMapping("/user/token")
+    public ResponseEntity<List<Rental>> getRentalsForUser(String token) {
+        int userId = 0;
         List<Rental> rentals = rentalService.getRentalsByUserId(userId);
         if (rentals.isEmpty()) {
             return ResponseEntity.notFound().build();
