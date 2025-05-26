@@ -79,4 +79,15 @@ public class Rental extends Entity<Integer> {
     public void setStatus(RentalStatus status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "Rental{" +
+                "item=" + item +
+                ", user=" + user +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", status=" + status +
+                '}';
+    }
 }

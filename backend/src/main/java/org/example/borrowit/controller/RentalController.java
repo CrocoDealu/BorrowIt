@@ -1,8 +1,10 @@
 package org.example.borrowit.controller;
 
+import org.example.borrowit.domain.Item;
 import org.example.borrowit.domain.Rental;
 import org.example.borrowit.domain.User;
 import org.example.borrowit.dto.RentalDto;
+import org.example.borrowit.service.ItemService;
 import org.example.borrowit.service.RentalService;
 import org.example.borrowit.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -20,10 +22,12 @@ public class RentalController {
 
     private final RentalService rentalService;
     private final UserService userService;
+    private final ItemService itemService;
 
-    public RentalController(RentalService rentalService, UserService userService) {
+    public RentalController(RentalService rentalService, UserService userService, ItemService itemService) {
         this.rentalService = rentalService;
         this.userService = userService;
+        this.itemService = itemService;
     }
 
     @GetMapping
@@ -49,13 +53,20 @@ public class RentalController {
         return rental.map(r -> ResponseEntity.ok(new RentalDto(r))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/rent")
-    public ResponseEntity<?> createRental(@RequestBody Rental rental, @RequestHeader("Authorization") String token) {
+    @PostMapping("/rent/{itemId}")
+    public ResponseEntity<?> createRental(@RequestBody Rental rental, @RequestHeader("Authorization") String token, @PathVariable Integer itemId) {
         if (token == null || token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         User user = userService.getUserByToken(token);
         rental.setUser(user);
+        Optional<Item> optItem = itemService.getItemById(itemId);
+        if (optItem.isEmpty()) {
+            return ResponseEntity.badRequest().body("Item not found");
+        }
+        Item item = optItem.get();
+        rental.setItem(item);
+        System.out.println(rental);
         Rental createdRental = rentalService.addRental(rental);
         if (createdRental != null) {
             return ResponseEntity.ok(new RentalDto(createdRental));

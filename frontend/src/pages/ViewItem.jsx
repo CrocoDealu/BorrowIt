@@ -22,7 +22,6 @@ const ViewItem = () => {
                 const userData = JSON.parse(localStorage.getItem('user'));
                 setUser(userData);
 
-                console.log(id);
                 const response = await axios.get(`/items/${id}`, {
                     headers: {
                         Authorization: `${localStorage.getItem('authToken')}`
@@ -75,7 +74,7 @@ const ViewItem = () => {
         console.log('Rent details submitted:', details);
 
         try {
-            let response = await axios.post('api/rentals/rent', details, {
+            let response = await axios.post(`rentals/rent/${id}`, details, {
                 headers: {
                     Authorization: `${localStorage.getItem('authToken')}`,
                     'Content-Type': 'application/json',
@@ -198,7 +197,7 @@ const ViewItem = () => {
                             <RentItem
                                 initialStartDate=""
                                 initialEndDate=""
-                                initialStatus="PENDING"
+                                status="PENDING"
                                 onSubmit={handleRentItemSubmit}
                                 onCancel={handleCancel}
                             />

@@ -3,27 +3,33 @@ import PropTypes from 'prop-types';
 
 const statuses = ['APPROVED', 'REJECTED', 'RETURNED', 'OVERDUE', 'CANCELLED', 'PENDING'];
 
-const RentItem = ({ initialStartDate, initialEndDate, initialStatus, onSubmit, onCancel }) => {
+const RentItem = ({ initialStartDate, initialEndDate, status, onSubmit, onCancel }) => {
     const [startDate, setStartDate] = useState(initialStartDate || '');
     const [endDate, setEndDate] = useState(initialEndDate || '');
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (new Date(startDate) > new Date(endDate)) {
+        const adjustedStartDate = new Date(startDate);
+        adjustedStartDate.setHours(0, 0, 0, 0); // Set to the start of the day
+
+        const adjustedEndDate = new Date(endDate);
+        adjustedEndDate.setHours(0, 0, 0, 0); // Set to the start of the day
+
+        if (adjustedStartDate > adjustedEndDate) {
             alert('Start date cannot be after end date');
             return;
         }
 
-        if (new Date(startDate) < Date.now()) {
+        if (adjustedStartDate < new Date().setHours(0, 0, 0, 0)) {
             alert('Start date cannot be in the past');
             return;
         }
 
         const rentDetails = {
-            startDate,
-            endDate,
-            initialStatus,
+            startDate: adjustedStartDate.toISOString(),
+            endDate: adjustedEndDate.toISOString(),
+            status,
         };
 
         onSubmit(rentDetails);
@@ -66,9 +72,9 @@ const RentItem = ({ initialStartDate, initialEndDate, initialStatus, onSubmit, o
 RentItem.propTypes = {
     initialStartDate: PropTypes.string,
     initialEndDate: PropTypes.string,
-    initialStatus: PropTypes.oneOf(statuses),
+    status: PropTypes.oneOf(statuses),
     onSubmit: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired, // Cancel callback is now required
+    onCancel: PropTypes.func.isRequired,
 };
 
 export default RentItem;
