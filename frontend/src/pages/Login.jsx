@@ -21,14 +21,11 @@ const Login = ({ setIsAuthenticated }) => {
                 password
             });
 
-            // Save token and user information in localStorage
             localStorage.setItem('authToken', response.data.token);
             localStorage.setItem('user', JSON.stringify(response.data.user));
 
-            // Update authentication state
             setIsAuthenticated(true);
 
-            // Navigate to the dashboard
             navigate('/dashboard');
         } catch (err) {
             if (err.response && err.response.data) {

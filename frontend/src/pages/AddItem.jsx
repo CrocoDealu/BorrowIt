@@ -55,21 +55,17 @@ const AddItem = () => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
 
-        // Create previews for the newly selected files
         const newPreviews = files.map(file => URL.createObjectURL(file));
         setImagePreviews([...imagePreviews, ...newPreviews]);
 
-        // Store the actual file objects for later upload
         setSelectedFiles([...selectedFiles, ...files]);
     };
 
     const removeImage = (index) => {
-        // Remove from previews
         const newPreviews = [...imagePreviews];
         newPreviews.splice(index, 1);
         setImagePreviews(newPreviews);
 
-        // Remove from selected files
         const newFiles = [...selectedFiles];
         newFiles.splice(index, 1);
         setSelectedFiles(newFiles);
@@ -92,7 +88,6 @@ const AddItem = () => {
 
             const formDataToSend = new FormData();
 
-            // Add the 'item' part as JSON
             const itemPart = {
                 title: formData.title,
                 category: formData.category,
@@ -105,11 +100,9 @@ const AddItem = () => {
             };
             formDataToSend.append('item', new Blob([JSON.stringify(itemPart)], { type: 'application/json' }));
 
-            // Add files with correct keys
             selectedFiles.forEach((file, index) => {
                 formDataToSend.append('files', file);
             });
-            console.log(formDataToSend);
 
             const response = await axios.post('/items', formDataToSend, {
                 headers: {

@@ -15,7 +15,6 @@ function App() {
     const checkAuth = async () => {
         const token = localStorage.getItem('authToken');
         if (token) {
-            console.log("Avem token " + token);
             try {
                 const response = await axios.get('/auth/validate-token', {
                     headers: { Authorization: `${token}` }
@@ -51,7 +50,7 @@ function App() {
                     !isAuthenticated ? <Login setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/dashboard" />
                 } />
                 <Route path="/register" element={
-                    !isAuthenticated ? <Register /> : <Navigate to="/dashboard" />
+                    !isAuthenticated ? <Register /> : <Navigate to="/login" />
                 } />
                 <Route path="/dashboard" element={
                     isAuthenticated ? <Dashboard /> : <Navigate to="/login" />

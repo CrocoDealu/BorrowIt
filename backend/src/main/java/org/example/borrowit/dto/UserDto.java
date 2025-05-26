@@ -1,15 +1,17 @@
 package org.example.borrowit.dto;
 
+import static org.example.borrowit.utils.HashStringUtility.hashOwnerIdentifier;
+
 public class UserDto {
     private String name;
-    private String email;
+    private final String userHash;
     private String address;
     private String contactNumber;
     private int accountBalance;
 
     public UserDto(String name, String email, String address, String contactNumber, int accountBalance) {
         this.name = name;
-        this.email = email;
+        this.userHash = hashOwnerIdentifier(email);
         this.address = address;
         this.contactNumber = contactNumber;
         this.accountBalance = accountBalance;
@@ -23,12 +25,8 @@ public class UserDto {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public String getUserHash() {
+        return userHash;
     }
 
     public String getAddress() {

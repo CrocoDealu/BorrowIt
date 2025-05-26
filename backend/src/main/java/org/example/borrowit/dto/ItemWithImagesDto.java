@@ -3,7 +3,12 @@ package org.example.borrowit.dto;
 import org.example.borrowit.domain.Entity;
 import org.example.borrowit.domain.Item;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
+
+import static org.example.borrowit.utils.HashStringUtility.hashOwnerIdentifier;
 
 public class ItemWithImagesDto extends Entity<Integer> {
     private String title;
@@ -15,6 +20,8 @@ public class ItemWithImagesDto extends Entity<Integer> {
     private String location;
     private String status;
     private String owner;
+    private String ownerHash;
+
 
     public ItemWithImagesDto(Item item, List<String> images) {
         super(item.getId());
@@ -27,6 +34,11 @@ public class ItemWithImagesDto extends Entity<Integer> {
         this.location = item.getLocation();
         this.status = item.getStatus().toString();
         this.owner = item.getOwner().getName();
+        this.ownerHash = hashOwnerIdentifier(item.getOwner().getEmail());
+    }
+
+    public String getOwnerHash() {
+        return ownerHash;
     }
 
     public String getTitle() {

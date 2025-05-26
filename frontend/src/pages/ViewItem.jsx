@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AppLayout from './AppLayout';
 import '../styles/ViewItem.css';
+import RentItem from "./RentItem.jsx";
 
 const ViewItem = () => {
     const { id } = useParams();
@@ -11,11 +12,13 @@ const ViewItem = () => {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
+    const [showRentItemForm, setShowRentItemForm] = useState(false);
+    const [rentDetails, setRentDetails] = useState(null);
+
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Get the currently logged in user
                 const userData = JSON.parse(localStorage.getItem('user'));
                 setUser(userData);
 
@@ -28,7 +31,11 @@ const ViewItem = () => {
 
                 setItem(response.data);
 
-                checkIfUserIsOwner(userData, response.data);
+                if (isUserOwner(userData, response.data)) {
+                    setIsOwner(true);
+                } else {
+                    setIsOwner(false);
+                }
 
             } catch (error) {
                 console.error('Error fetching item details:', error);
@@ -40,24 +47,8 @@ const ViewItem = () => {
         fetchData();
     }, [id]);
 
-    const checkIfUserIsOwner = (user, item) => {
-        // Your ownership check logic here
-        return true; // For now, always return true as in your example
-    };
-
-    const handleBorrowRequest = async () => {
-        try {
-            await axios.post(`/api/items/${id}/borrow`, {}, {
-                headers: {
-                    Authorization: `${localStorage.getItem('authToken')}`
-                }
-            });
-            alert('Borrow request sent successfully!');
-            navigate('/dashboard');
-        } catch (error) {
-            console.error('Error sending borrow request:', error);
-            alert('Failed to send borrow request. Please try again.');
-        }
+    const isUserOwner = (user, item) => {
+        return item.ownerHash === user.userHash;
     };
 
     const renderValue = (value, defaultValue = 'Unknown') => {
@@ -72,6 +63,33 @@ const ViewItem = () => {
             return JSON.stringify(value);
         }
         return value;
+    };
+
+    const handleBorrowRequest = () => {
+        setShowRentItemForm(true);
+    };
+
+    const handleRentItemSubmit = async (details) => {
+        setRentDetails(details);
+        setShowRentItemForm(false);
+        console.log('Rent details submitted:', details);
+
+        try {
+            let response = await axios.post('api/rentals/rent', details, {
+                headers: {
+                    Authorization: `${localStorage.getItem('authToken')}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log('API Response:', response.data);
+        } catch (error) {
+            console.error('Error submitting rent details:', error);
+        }
+    };
+
+    const handleCancel = () => {
+        setShowRentItemForm(false);
     };
 
     if (isLoading) {
@@ -155,7 +173,7 @@ const ViewItem = () => {
                             </button>
 
                             {/* Only show borrow button if the user is not the owner */}
-                            {!isOwner && renderValue(item.status) === 'Available' && (
+                            {!isOwner && renderValue(item.status) !== 'UNAVAILABLE' && (
                                 <button
                                     onClick={handleBorrowRequest}
                                     className="action-button borrow-button"
@@ -175,6 +193,17 @@ const ViewItem = () => {
                             )}
                         </div>
                     </div>
+                    {showRentItemForm && (
+                        <div className="rent-item-modal">
+                            <RentItem
+                                initialStartDate=""
+                                initialEndDate=""
+                                initialStatus="PENDING"
+                                onSubmit={handleRentItemSubmit}
+                                onCancel={handleCancel}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </AppLayout>

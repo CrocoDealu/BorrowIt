@@ -5,6 +5,7 @@ public enum RentalStatus {
     REJECTED,
     RETURNED,
     OVERDUE,
+    PENDING,
     CANCELLED;
 
     public static RentalStatus fromString(String status) {
