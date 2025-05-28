@@ -136,7 +136,6 @@ public class ItemController {
         }
         item.setImages(images);
         Item createdItem = itemService.addItem(item);
-
         return ResponseEntity.status(201).body(createdItem);
     }
 
