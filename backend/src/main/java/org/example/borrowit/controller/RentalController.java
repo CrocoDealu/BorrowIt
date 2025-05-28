@@ -69,7 +69,7 @@ public class RentalController {
     }
 
     @PutMapping("/mark-as-returned/{rentalId}")
-    public ResponseEntity<?> markAsReturned(@PathVariable("rentalId") Integer id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> markAsMarkReturned(@PathVariable("rentalId") Integer id, @RequestHeader("Authorization") String token) {
         if (token == null || token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -88,7 +88,28 @@ public class RentalController {
         rental.setStatus(RentalStatus.MARKED_AS_RETURNED);
         Rental updatedRental = rentalService.updateRental(rental);
         return ResponseEntity.ok(new RentalDto(updatedRental));
+    }
 
+    @PutMapping("returned/{rentalId}")
+    public ResponseEntity<?> markAsReturned(@PathVariable("rentalId") Integer id, @RequestHeader("Authorization") String token) {
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Optional<Rental> rentalOpt = rentalService.getRentalById(id);
+        if (rentalOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Rental rental = rentalOpt.get();
+        if (!rental.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not allowed to mark this rental as returned");
+        }
+        rental.setStatus(RentalStatus.RETURNED);
+        Rental updatedRental = rentalService.updateRental(rental);
+        return ResponseEntity.ok(new RentalDto(updatedRental));
     }
 
     @PostMapping("/rent/{itemId}")
