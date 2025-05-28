@@ -42,4 +42,7 @@ public class ItemService {
         return itemRepository.update(item);
     }
 
+    public List<Item> getItemsUserCanRent(int userid) {
+        return StreamSupport.stream(itemRepository.findAll().spliterator(), false).filter(item -> item.getOwner().getId() != userid).toList();
+    }
 }

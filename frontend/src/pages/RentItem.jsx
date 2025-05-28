@@ -1,73 +1,89 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
+import RentalCalendar from './RentalCalendar';
+import axios from "axios";
 
-const statuses = ['APPROVED', 'REJECTED', 'RETURNED', 'OVERDUE', 'CANCELLED', 'PENDING'];
+const statuses = ['RETURNED', 'OVERDUE', 'RENTED', 'CANCELLED', 'MARKED_AS_RETURNED'];
 
-const RentItem = ({ initialStartDate, initialEndDate, status, onSubmit, onCancel }) => {
+const RentItem = ({ itemId, initialStartDate, initialEndDate, status, onSubmit, onCancel }) => {
     const [startDate, setStartDate] = useState(initialStartDate || '');
     const [endDate, setEndDate] = useState(initialEndDate || '');
+    const [existingRentals, setExistingRentals] = useState([]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    useEffect(() => {
+        getExistingRentalDates(itemId);
+    }, [itemId]);
 
-        const adjustedStartDate = new Date(startDate);
-        adjustedStartDate.setHours(0, 0, 0, 0); // Set to the start of the day
-
-        const adjustedEndDate = new Date(endDate);
-        adjustedEndDate.setHours(0, 0, 0, 0); // Set to the start of the day
-
-        if (adjustedStartDate > adjustedEndDate) {
-            alert('Start date cannot be after end date');
+    function setSelectedDateRange(range) {
+        if (range === null) {
             return;
         }
+        setStartDate(range.startDate);
+        setEndDate(range.endDate);
+    }
 
-        if (adjustedStartDate < new Date().setHours(0, 0, 0, 0)) {
-            alert('Start date cannot be in the past');
-            return;
-        }
-
-        const rentDetails = {
-            startDate: adjustedStartDate.toISOString(),
-            endDate: adjustedEndDate.toISOString(),
-            status,
-        };
-
-        onSubmit(rentDetails);
+    const handleDateRangeSelect = (range) => {
+        setSelectedDateRange(range);
     };
 
-    return (
-        <div className="rent-item-container">
-            <form onSubmit={handleSubmit} className="rent-item-form">
-                <div>
-                    <label htmlFor="startDate">Start Date:</label>
-                    <input
-                        type="date"
-                        id="startDate"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        required
-                    />
-                </div>
+    const getExistingRentalDates = async () => {
+        try {
+            const response = await axios.get(`/rentals/item/${itemId}`, {
+                headers:
+                    {
+                        "Authorization": `${localStorage.getItem('authToken')}`,
+                    }
+            });
+            setExistingRentals(response.data);
+        } catch
+            (error)
+            {
+                console.error("Error fetching existing rental dates:", error);
+            }
+        }
 
-                <div>
-                    <label htmlFor="endDate">End Date:</label>
-                    <input
-                        type="date"
-                        id="endDate"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        required
-                    />
-                </div>
+        const handleSubmit = (e) => {
+            e.preventDefault();
 
-                <button type="submit">Submit</button>
-            </form>
-            <button onClick={onCancel} className="action-button cancel-button">
-                Cancel
-            </button>
-        </div>
-    );
-};
+            const adjustedStartDate = new Date(startDate);
+            adjustedStartDate.setHours(12, 0, 0, 0);
+
+            const adjustedEndDate = new Date(endDate);
+            adjustedEndDate.setHours(12, 0, 0, 0);
+
+            console.log(adjustedStartDate.toISOString());
+            console.log(adjustedEndDate.toISOString());
+            if (adjustedStartDate > adjustedEndDate) {
+                alert('Start date cannot be after end date');
+                return;
+            }
+
+            if (adjustedStartDate < new Date().setHours(0, 0, 0, 0)) {
+                alert('Start date cannot be in the past');
+                return;
+            }
+
+            const rentDetails = {
+                startDate: adjustedStartDate.toISOString(),
+                endDate: adjustedEndDate.toISOString(),
+                status,
+            };
+
+            onSubmit(rentDetails);
+        };
+
+        return (
+            <div className="rent-item-container">
+                <form onSubmit={handleSubmit} className="rent-item-form">
+                    <RentalCalendar existingRentals={existingRentals} onDateRangeSelect={handleDateRangeSelect}/>
+                    <button type="submit">Submit</button>
+                </form>
+                <button onClick={onCancel} className="action-button cancel-button">
+                    Cancel
+                </button>
+            </div>
+        );
+    };
 
 RentItem.propTypes = {
     initialStartDate: PropTypes.string,

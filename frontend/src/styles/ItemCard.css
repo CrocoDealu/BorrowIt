@@ -1,0 +1,18 @@
+.item-rental-period {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.item-rental-period span {
+    font-weight: 500;
+    color: #333;
+}
+
+.item-rental-period span:first-child {
+    font-weight: bold;
+    color: #4a90e2; /* Highlight the label */
+}

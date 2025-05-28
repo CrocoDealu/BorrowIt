@@ -1,34 +1,40 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import AppLayout from './AppLayout';
 import '../styles/ViewItem.css';
-import RentItem from "./RentItem.jsx";
+import RentItem from './RentItem.jsx';
 
 const ViewItem = () => {
     const { id } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
     const [item, setItem] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [showRentItemForm, setShowRentItemForm] = useState(false);
     const [rentDetails, setRentDetails] = useState(null);
-
+    const [rentalInfo, setRentalInfo] = useState(null);
+    const [type, setType] = useState(""); // Determine user role
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const userData = JSON.parse(localStorage.getItem('user'));
+                const userData = JSON.parse(localStorage.getItem("user"));
                 setUser(userData);
 
                 const response = await axios.get(`/items/${id}`, {
                     headers: {
-                        Authorization: `${localStorage.getItem('authToken')}`
-                    }
+                        Authorization: `${localStorage.getItem("authToken")}`,
+                    },
                 });
 
                 setItem(response.data);
+
+                const queryParams = new URLSearchParams(location.search);
+                const itemType = queryParams.get("type");
+                setType(itemType || "viewer");
 
                 if (isUserOwner(userData, response.data)) {
                     setIsOwner(true);
@@ -36,25 +42,36 @@ const ViewItem = () => {
                     setIsOwner(false);
                 }
 
+                if (location.state?.rentalInfo && itemType === "rented") {
+                    setRentalInfo(location.state.rentalInfo);
+                }
+                else if (response.data.status === "RENTED") {
+                    const rentalResponse = await axios.get(`/rentals/${id}`, {
+                        headers: {
+                            Authorization: `${localStorage.getItem("authToken")}`,
+                        },
+                    });
+                    setRentalInfo(rentalResponse.data);
+                }
             } catch (error) {
-                console.error('Error fetching item details:', error);
+                console.error("Error fetching item details:", error);
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchData();
-    }, [id]);
+    }, [id, location]);
 
     const isUserOwner = (user, item) => {
         return item.ownerHash === user.userHash;
     };
 
-    const renderValue = (value, defaultValue = 'Unknown') => {
+    const renderValue = (value, defaultValue = "Unknown") => {
         if (value === null || value === undefined) {
             return defaultValue;
         }
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
             if (value.name) return value.name;
             if (value.toString && value.toString !== Object.prototype.toString) {
                 return value.toString();
@@ -64,6 +81,12 @@ const ViewItem = () => {
         return value;
     };
 
+    const formatDate = (dateString) => {
+        const options = { year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" };
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+    };
+
     const handleBorrowRequest = () => {
         setShowRentItemForm(true);
     };
@@ -71,24 +94,36 @@ const ViewItem = () => {
     const handleRentItemSubmit = async (details) => {
         setRentDetails(details);
         setShowRentItemForm(false);
-        console.log('Rent details submitted:', details);
 
         try {
-            let response = await axios.post(`rentals/rent/${id}`, details, {
+            const response = await axios.post(`rentals/rent/${id}`, details, {
                 headers: {
-                    Authorization: `${localStorage.getItem('authToken')}`,
-                    'Content-Type': 'application/json',
+                    Authorization: `${localStorage.getItem("authToken")}`,
+                    "Content-Type": "application/json",
                 },
             });
-
-            console.log('API Response:', response.data);
+            navigate('/borrowed-items');
         } catch (error) {
-            console.error('Error submitting rent details:', error);
+            console.error("Error submitting rent details:", error);
         }
     };
 
     const handleCancel = () => {
         setShowRentItemForm(false);
+    };
+
+    const handleReturnItem = async () => {
+        try {
+            const response = await axios.put(`/rentals/mark-as-returned/${rentalInfo.rentalId}`, null, {
+                headers: {
+                    Authorization: `${localStorage.getItem("authToken")}`,
+                },
+            });
+
+            navigate("/borrowed-items");
+        } catch (error) {
+            console.error("Error returning item:", error);
+        }
     };
 
     if (isLoading) {
@@ -114,9 +149,11 @@ const ViewItem = () => {
                 <div className="item-detail-container">
                     <div className="item-detail-image">
                         <img
-                            src={item.images && item.images.length > 0
-                                ? "data:image/png;base64," + item.images[0]
-                                : "/no_image.jpeg"}
+                            src={
+                                item.images && item.images.length > 0
+                                    ? "data:image/png;base64," + item.images[0]
+                                    : "/no_image.jpeg"
+                            }
                             alt={renderValue(item.title)}
                         />
                         {item.images && item.images.length > 1 && (
@@ -125,7 +162,9 @@ const ViewItem = () => {
                                     <img
                                         key={index}
                                         src={`data:image/png;base64, ${image}`}
-                                        alt={`${renderValue(item.title)} - additional view ${index + 1}`}
+                                        alt={`${renderValue(item.title)} - additional view ${
+                                            index + 1
+                                        }`}
                                         className="additional-image"
                                     />
                                 ))}
@@ -163,6 +202,23 @@ const ViewItem = () => {
                             </div>
                         )}
 
+                        {/* Show rental-specific details if the item is rented */}
+                        {rentalInfo && (
+                            <div className="rental-info">
+                                <h4> Rental Information</h4>
+                                <div className="meta-item">
+                                    {/*<span className="meta-label">Current Renter:</span>*/}
+                                    <span className="meta-value">{rentalInfo.renterName}</span>
+                                </div>
+                                <div className="meta-item">
+                                    <span className="meta-label">Rental Period:</span>
+                                    <span className="meta-value">
+                                        {formatDate(rentalInfo.startDate)} to {formatDate(rentalInfo.endDate)}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="item-detail-actions">
                             <button
                                 onClick={() => navigate(-1)}
@@ -171,18 +227,8 @@ const ViewItem = () => {
                                 Back
                             </button>
 
-                            {/* Only show borrow button if the user is not the owner */}
-                            {!isOwner && renderValue(item.status) !== 'UNAVAILABLE' && (
-                                <button
-                                    onClick={handleBorrowRequest}
-                                    className="action-button borrow-button"
-                                >
-                                    Request to Borrow
-                                </button>
-                            )}
-
-                            {/* If user is the owner, show edit button */}
-                            {isOwner && (
+                            {/* Conditional Buttons Based on Type */}
+                            {type === "owner" && (
                                 <button
                                     onClick={() => navigate(`/edit-item/${id}`)}
                                     className="action-button edit-button"
@@ -190,14 +236,31 @@ const ViewItem = () => {
                                     Edit Item
                                 </button>
                             )}
+                            {type === "rented" && (
+                                <button
+                                    onClick={handleReturnItem}
+                                    className="action-button return-button"
+                                >
+                                    Return Item
+                                </button>
+                            )}
+                            {type === "viewer" && renderValue(item.status) !== "UNAVAILABLE" && (
+                                <button
+                                    onClick={handleBorrowRequest}
+                                    className="action-button borrow-button"
+                                >
+                                    Request to Borrow
+                                </button>
+                            )}
                         </div>
                     </div>
                     {showRentItemForm && (
                         <div className="rent-item-modal">
                             <RentItem
+                                itemId={id}
                                 initialStartDate=""
                                 initialEndDate=""
-                                status="PENDING"
+                                status="RENTED"
                                 onSubmit={handleRentItemSubmit}
                                 onCancel={handleCancel}
                             />

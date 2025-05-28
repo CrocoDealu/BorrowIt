@@ -29,6 +29,10 @@ public class RentalService {
         return rentalRepository.save(rental);
     }
 
+    public List<Rental> getRentalsByItemId(int itemId) {
+        return StreamSupport.stream(rentalRepository.findRentalsByItemId(itemId).spliterator(), false).toList();
+    }
+
     public Rental updateRental(Rental rental) {
         return rentalRepository.update(rental);
     }

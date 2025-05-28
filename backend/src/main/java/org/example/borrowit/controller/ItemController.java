@@ -33,8 +33,16 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemWithImagesDto>> getAllItems() {
-        List<Item> items = itemService.getAllItems();
+    public ResponseEntity<List<ItemWithImagesDto>> getAllItems(@RequestHeader("Authorization") String authToken) {
+        if (authToken == null || authToken.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = userService.getUserByToken(authToken);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        int userId = user.getId();
+        List<Item> items = itemService.getItemsUserCanRent(userId);
 
         List<ItemWithImagesDto> itemsWithImages = convertToItemDto(items);
         return ResponseEntity.ok(itemsWithImages);

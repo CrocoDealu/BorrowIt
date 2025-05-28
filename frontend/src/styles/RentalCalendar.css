@@ -1,0 +1,113 @@
+.rental-calendar-container {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: white;
+    margin: 20px 0;
+}
+
+.date-pickers {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.date-picker-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-picker-container label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
+.react-datepicker__input-container input {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.invalid-date {
+    border-color: #dc3545 !important;
+    background-color: #fff8f8 !important;
+}
+
+.validation-error {
+    color: #dc3545;
+    margin: 10px 0;
+    padding: 8px 12px;
+    background-color: #fff8f8;
+    border-left: 3px solid #dc3545;
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.available-square,
+.unavailable-square,
+.selected-square {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.available-square {
+    background-color: white;
+    border: 1px solid #ddd;
+}
+
+.unavailable-square {
+    background-color: #ffcccb;
+}
+
+.selected-square {
+    background-color: #b3d7ff;
+}
+
+/* Styling for the react-datepicker custom highlights */
+.react-datepicker__day--highlighted-custom-unavailable {
+    background-color: #ffcccb !important;
+    color: #333 !important;
+}
+
+.react-datepicker__day--highlighted-custom-selected {
+    background-color: #b3d7ff !important;
+    color: #333 !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-selecting-range,
+.react-datepicker__day--in-range {
+    background-color: #2684ff !important;
+    color: white !important;
+}
+
+/* Override the disabled styles to make them more visible */
+.react-datepicker__day--disabled {
+    text-decoration: line-through;
+    color: #ccc !important;
+    background-color: #f8f8f8 !important;
+    cursor: not-allowed;
+}
+
+.calendar-view {
+    display: flex;
+    justify-content: center;
+}

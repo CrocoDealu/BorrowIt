@@ -1,12 +1,11 @@
 package org.example.borrowit.utils;
 
 public enum RentalStatus {
-    APPROVED,
-    REJECTED,
     RETURNED,
     OVERDUE,
-    PENDING,
-    CANCELLED;
+    RENTED,
+    CANCELLED,
+    MARKED_AS_RETURNED;
 
     public static RentalStatus fromString(String status) {
         try {

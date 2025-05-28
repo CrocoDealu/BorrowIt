@@ -56,7 +56,7 @@ const LentItems = () => {
                             <ItemCard
                                 key={item.id}
                                 item={item}
-                                type="lent"
+                                type="owner"
                                 onDelete={handleDeleteItem}
                             />
                         ))}

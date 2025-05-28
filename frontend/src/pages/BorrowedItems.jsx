@@ -55,8 +55,8 @@ const BorrowedItems = () => {
                             <ItemCard
                                 key={item.id}
                                 item={item}
-                                type="borrowed"
-                                onReturn={handleReturnItem}
+                                type="rented"
+                                onDelete={handleReturnItem}
                             />
                         ))}
                     </div>

@@ -10,17 +10,23 @@ import java.time.LocalDateTime;
 public class RentalDto extends Entity<Integer> {
     private String userHash;
     private int itemId;
+    private String title;
+    private String description;
+    private String owner;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private RentalStatus status;
 
-    public RentalDto(int id, String userHash, int itemId, LocalDateTime startDate, LocalDateTime endDate, RentalStatus status) {
+    public RentalDto(int id, String userHash, int itemId, LocalDateTime startDate, LocalDateTime endDate, RentalStatus status, String title, String description, String owner) {
         super(id);
+        this.title = title;
+        this.description = description;
         this.userHash = userHash;
         this.itemId = itemId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
+        this.owner = owner;
     }
 
     public RentalDto(Rental rental) {
@@ -30,6 +36,9 @@ public class RentalDto extends Entity<Integer> {
         this.startDate = rental.getStartDate();
         this.endDate = rental.getEndDate();
         this.status = rental.getStatus();
+        this.title = rental.getItem().getTitle();
+        this.description = rental.getItem().getDescription();
+        this.owner = rental.getItem().getOwner().getName();
     }
     public String getUserHash() {
         return userHash;
@@ -69,5 +78,25 @@ public class RentalDto extends Entity<Integer> {
 
     public void setStatus(RentalStatus status) {
         this.status = status;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getOwner() {
+        return owner;
     }
 }

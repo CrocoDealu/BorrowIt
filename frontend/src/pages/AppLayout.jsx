@@ -54,6 +54,7 @@ const AppLayout = ({ children, pageTitle }) => {
             <header className="dashboard-header">
                 <h1>BorrowIt Dashboard</h1>
                 <div className="header-actions">
+                    <button className="action-button" onClick={() => navigate('/dashboard')}>Home</button>
                     <button
                         className="action-button add-item"
                         onClick={() => navigate('/add-item')}

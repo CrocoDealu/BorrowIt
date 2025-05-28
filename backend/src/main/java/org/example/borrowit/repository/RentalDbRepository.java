@@ -4,12 +4,14 @@ import jakarta.persistence.NoResultException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.example.borrowit.domain.Rental;
+import org.example.borrowit.utils.RentalStatus;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,7 +28,7 @@ public class RentalDbRepository implements RentalRepository {
     @Override
     public Iterable<Rental> findRentalsByUserId(int userId) {
         logger.info("Finding rentals for user with id {}", userId);
-        String hql = "FROM Rental r WHERE r.user.id = :userId";
+        String hql = "FROM Rental r WHERE r.user.id = :userId and r.status = " + RentalStatus.RENTED;
         Iterable<Rental> rentals;
 
         try (Session session = getSession()) {
@@ -123,6 +125,21 @@ public class RentalDbRepository implements RentalRepository {
         }
         logger.info("Updated rental {}", entity);
         return entity;
+    }
+
+    @Override
+    public Iterable<Rental> findRentalsByItemId(int itemId) {
+        logger.info("Finding rentals for item with id {}", itemId);
+        String hql = "FROM Rental r WHERE r.item.id = :itemId and r.status = " + RentalStatus.RENTED;
+        Iterable<Rental> rentals;
+
+        try (Session session = getSession()) {
+            rentals = session.createQuery(hql, Rental.class).setParameter("itemId", itemId).getResultList();
+        } catch (Exception e) {
+            throw new RuntimeException("Error finding rentals for item: " + e.getMessage());
+        }
+        logger.info("Found rentals for item {}", itemId);
+        return rentals;
     }
 
     private Session getSession() {

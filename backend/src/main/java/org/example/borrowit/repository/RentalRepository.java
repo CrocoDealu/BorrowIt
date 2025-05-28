@@ -10,5 +10,6 @@ public interface RentalRepository extends IRepository<Integer, Rental> {
      * @return an iterable collection of rentals associated with the specified user ID.
      */
     Iterable<Rental> findRentalsByUserId(int userId);
+    Iterable<Rental> findRentalsByItemId(int itemId);
 
 }

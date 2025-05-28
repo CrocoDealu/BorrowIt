@@ -12,7 +12,11 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchItems = async () => {
             try {
-                const response = await axios.get('/items');
+                const response = await axios.get('/items', {
+                    headers: {
+                        Authorization: `${localStorage.getItem('authToken')}`
+                    }
+                });
                 console.log('API Response:', response.data);
                 setItems(response.data);
             } catch (error) {
@@ -36,7 +40,7 @@ const Dashboard = () => {
                 {items.length > 0 ? (
                     <div className="items-grid">
                         {items.map((item) => (
-                            <ItemCard key={item.id} item={item} type="regular" onDelete={null}/>
+                            <ItemCard key={item.id} item={item} type="viewer" onDelete={null}/>
                         ))}
                     </div>
                 ) : (
