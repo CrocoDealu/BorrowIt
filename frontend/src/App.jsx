@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import LentItems from "./pages/LentItems.jsx";
 import ViewItem from "./pages/ViewItem.jsx";
+import BorrowedItems from "./pages/BorrowedItems.jsx";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -63,6 +64,9 @@ function App() {
                 } />
                 <Route path="/view-item/:id" element={
                     isAuthenticated ? <ViewItem /> : <Navigate to="/login" />
+                } />
+                <Route path="/borrowed-items" element={
+                    isAuthenticated ? <BorrowedItems/> : <Navigate to="/login" />
                 } />
                 <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
             </Routes>

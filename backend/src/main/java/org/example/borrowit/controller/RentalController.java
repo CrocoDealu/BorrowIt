@@ -35,16 +35,18 @@ public class RentalController {
         return ResponseEntity.ok().body(rentalService.getAllRentals().stream().map(RentalDto::new).toList());
     }
 
-    @GetMapping("/user/token")
+    @GetMapping("/user")
     public ResponseEntity<List<RentalDto>> getRentalsForUser(@RequestHeader("Authorization") String token) {
-        int userId = 0;
-        List<Rental> rentals = rentalService.getRentalsByUserId(userId);
-        List<RentalDto> rentalDtos = rentals.stream().map(RentalDto::new).toList();
-        if (rentalDtos.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(rentalDtos);
+        if (token == null || token.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = userService.getUserByToken(token);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        List<Rental> rentals = rentalService.getRentalsByUserId(user.getId());
+        List<RentalDto> rentalDtos = rentals.stream().map(RentalDto::new).toList();
+        return ResponseEntity.ok(rentalDtos);
     }
 
     @GetMapping("/item/id")
