@@ -11,17 +11,15 @@ const AddItem = () => {
         condition: '',
         rentPrice: '',
         location: '',
-        status: 'AVAILABLE' // Default value
+        status: 'AVAILABLE'
     });
 
-    // Keep selected files in a separate state
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [imagePreviews, setImagePreviews] = useState([]);
     const navigate = useNavigate();
 
-    // These should match your backend enums
     const categories = [
         'ELECTRONICS', 'BOOKS', 'TOOLS', 'KITCHEN', 'SPORTS',
         'OUTDOOR', 'CLOTHING', 'FURNITURE', 'GAMES', 'OTHER'

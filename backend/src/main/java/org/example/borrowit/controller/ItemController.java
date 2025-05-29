@@ -8,6 +8,7 @@ import org.example.borrowit.service.ItemService;
 import org.example.borrowit.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,26 +34,25 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemWithImagesDto>> getAllItems(@RequestHeader("Authorization") String authToken) {
-        if (authToken == null || authToken.isEmpty()) {
+    public ResponseEntity<List<ItemWithImagesDto>> getAllItems(Authentication authentication) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(authToken);
+
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         int userId = user.getId();
         List<Item> items = itemService.getItemsUserCanRent(userId);
-
         List<ItemWithImagesDto> itemsWithImages = convertToItemDto(items);
         return ResponseEntity.ok(itemsWithImages);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemWithImagesDto> getItemById(@PathVariable Integer id, @RequestHeader("Authorization") String authToken) {
-        if (authToken == null || authToken.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<ItemWithImagesDto> getItemById(@PathVariable Integer id) {
         try {
             ItemWithImagesDto itemWithImagesDto = itemService.getItemById(id)
                     .map(item -> new ItemWithImagesDto(item, item.getImages().stream()
@@ -82,11 +82,17 @@ public class ItemController {
     }
 
     @GetMapping("/lent/user")
-    public ResponseEntity<List<ItemWithImagesDto>> getItemsLentByUserId(@RequestHeader("Authorization") String authToken) {
-        if (userService.getUserByToken(authToken) == null) {
+    public ResponseEntity<List<ItemWithImagesDto>> getItemsLentByUserId(Authentication authentication) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(authToken);
+
+        String email = authentication.getName();
+        User user = userService.getUserByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         List<Item> items = itemService.getAllItemsForUser(user.getId());
         List<ItemWithImagesDto> itemsWithImages = convertToItemDto(items);
         if (itemsWithImages.isEmpty()) {
@@ -94,6 +100,62 @@ public class ItemController {
         } else {
             return ResponseEntity.ok(itemsWithImages);
         }
+    }
+
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<Item> addItem(
+            @RequestPart("item") Item item,
+            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            Authentication authentication
+    ) {
+        String email = authentication.getName();
+        User currentUser = userService.getUserByEmail(email).orElse(null);
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        item.setOwner(currentUser);
+
+        List<String> images = new ArrayList<>();
+        System.out.println("Request body with user: " + item);
+        if (files != null && !files.isEmpty()) {
+            images = saveImages(files, images);
+        }
+        item.setImages(images);
+        Item createdItem = itemService.addItem(item);
+        return ResponseEntity.status(201).body(createdItem);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Item> deleteItemById(@PathVariable Integer id, Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Optional<Item> deletedItem = itemService.deleteItem(id);
+        return deletedItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    private static List<String> saveImages(List<MultipartFile> files, List<String> images) {
+        for (MultipartFile file : files) {
+            String fileName = file.getOriginalFilename();
+            String uploadDir = "images/";
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            try {
+                if (!Files.exists(filePath)) {
+                    Files.createDirectories(filePath.getParent());
+                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    System.out.println("File already exists: " + filePath.toString());
+                }
+
+                images.add(fileName);
+            } catch (IOException e) {
+                System.err.println("Failed to save file: " + fileName);
+                e.printStackTrace();
+            }
+        }
+        return images;
     }
 
     private List<ItemWithImagesDto> convertToItemDto(List<Item> items) {
@@ -120,54 +182,4 @@ public class ItemController {
                 .toList();
     }
 
-    @PostMapping(consumes = "multipart/form-data")
-    public ResponseEntity<Item> addItem(
-            @RequestPart("item") Item item,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @RequestHeader("Authorization") String token
-    ) {
-        User currentUser = userService.getUserByToken(token);
-        item.setOwner(currentUser);
-
-        List<String> images = new ArrayList<>();
-        System.out.println("Request body with user: " + item);
-        if (files != null && !files.isEmpty()) {
-            images = saveImages(files, images);
-        }
-        item.setImages(images);
-        Item createdItem = itemService.addItem(item);
-        return ResponseEntity.status(201).body(createdItem);
-    }
-
-    private static List<String> saveImages(List<MultipartFile> files, List<String> images) {
-        for (MultipartFile file : files) {
-            String fileName = file.getOriginalFilename();
-            String uploadDir = "images/";
-            Path filePath = Paths.get(uploadDir, fileName);
-
-            try {
-                if (!Files.exists(filePath)) {
-                    Files.createDirectories(filePath.getParent());
-                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                } else {
-                    System.out.println("File already exists: " + filePath.toString());
-                }
-
-                images.add(fileName);
-            } catch (IOException e) {
-                System.err.println("Failed to save file: " + fileName);
-                e.printStackTrace();
-            }
-        }
-        return images;
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Item> deleteItemById(@PathVariable Integer id, @RequestHeader("Authorization") String token) {
-        if (userService.getUserByToken(token) == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        Optional<Item> deletedItem = itemService.deleteItem(id);
-        return deletedItem.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 }

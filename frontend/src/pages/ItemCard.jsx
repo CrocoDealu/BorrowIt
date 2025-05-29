@@ -60,7 +60,7 @@ const ItemCard = ({ item, type, onDelete }) => {
                         {onDelete && (
                             <button
                                 onClick={(e) => {
-                                    e.stopPropagation(); // Prevent navigation on button click
+                                    e.stopPropagation();
                                     onDelete(item.id);
                                 }}
                                 className="delete-button"

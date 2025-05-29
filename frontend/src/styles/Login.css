@@ -111,3 +111,52 @@ a:hover {
 .forgot-password {
     font-size: 14px;
 }
+
+.google-login-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#customBtn {
+    display: inline-block;
+    background-color: #F2F2F2;
+    color: #444;
+    width: 70%;
+    border-radius: 5px;
+    border: thin solid #888;
+    box-shadow: 1px 1px 1px grey;
+    white-space: nowrap;
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#customBtn:hover {
+    background-color: #f6f6f6;
+}
+
+span.label {
+    font-family: serif;
+    font-weight: normal;
+}
+
+span.icon {
+    background: url('g-normal.png') transparent 50% no-repeat;
+    display: inline-block;
+    vertical-align: middle;
+    width: 42px;
+    height: 42px;
+}
+
+span.buttonText {
+    display: inline-block;
+    vertical-align: middle;
+    padding-left: 42px;
+    padding-right: 42px;
+    font-size: 14px;
+    font-weight: bold;
+    font-family: 'Roboto', sans-serif;
+}
+

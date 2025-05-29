@@ -11,6 +11,7 @@ import org.example.borrowit.service.UserService;
 import org.example.borrowit.utils.RentalStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -38,27 +39,36 @@ public class RentalController {
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<RentalDto>> getRentalsForUser(@RequestHeader("Authorization") String token) {
-        if (token == null || token.isEmpty()) {
+    public ResponseEntity<List<RentalDto>> getRentalsForUser(Authentication authentication) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        String email = authentication.getName();
+        Optional<User> optUser = userService.getUserByEmail(email);
+        if (optUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = optUser.get();
         List<Rental> rentals = rentalService.getRentalsByUserId(user.getId());
+
         List<RentalDto> rentalDtos = rentals.stream().map(RentalDto::new).toList();
         return ResponseEntity.ok(rentalDtos);
     }
 
     @GetMapping("/id")
-    public ResponseEntity<RentalDto> getRentalsId(Integer rentalId) {
+    public ResponseEntity<RentalDto> getRentalsId(Authentication authentication, Integer rentalId) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Optional<Rental> rental = rentalService.getRentalById(rentalId);
         return rental.map(r -> ResponseEntity.ok(new RentalDto(r))).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/item/{id}")
-    public ResponseEntity<List<RentalDatesDto>> getRentalsForItem(@PathVariable("id") Integer itemId) {
+    public ResponseEntity<List<RentalDatesDto>> getRentalsForItem(@PathVariable("id") Integer itemId, Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         Optional<Item> item = itemService.getItemById(itemId);
         if (item.isEmpty()) {
             return ResponseEntity.badRequest().body(new ArrayList<>());
@@ -69,14 +79,16 @@ public class RentalController {
     }
 
     @PutMapping("/mark-as-returned/{rentalId}")
-    public ResponseEntity<?> markAsMarkReturned(@PathVariable("rentalId") Integer id, @RequestHeader("Authorization") String token) {
-        if (token == null || token.isEmpty()) {
+    public ResponseEntity<?> markAsMarkReturned(@PathVariable("rentalId") Integer id, Authentication authentication) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        String email = authentication.getName();
+        Optional<User> optUser = userService.getUserByEmail(email);
+        if (optUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = optUser.get();
         Optional<Rental> rentalOpt = rentalService.getRentalById(id);
         if (rentalOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -91,14 +103,16 @@ public class RentalController {
     }
 
     @PutMapping("returned/{rentalId}")
-    public ResponseEntity<?> markAsReturned(@PathVariable("rentalId") Integer id, @RequestHeader("Authorization") String token) {
-        if (token == null || token.isEmpty()) {
+    public ResponseEntity<?> markAsReturned(@PathVariable("rentalId") Integer id, Authentication authentication) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(token);
-        if (user == null) {
+        String email = authentication.getName();
+        Optional<User> optUser = userService.getUserByEmail(email);
+        if (optUser.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = optUser.get();
         Optional<Rental> rentalOpt = rentalService.getRentalById(id);
         if (rentalOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -113,11 +127,16 @@ public class RentalController {
     }
 
     @PostMapping("/rent/{itemId}")
-    public ResponseEntity<?> createRental(@RequestBody Rental rental, @RequestHeader("Authorization") String token, @PathVariable Integer itemId) {
-        if (token == null || token.isEmpty()) {
+    public ResponseEntity<?> createRental(@RequestBody Rental rental, Authentication authentication, @PathVariable Integer itemId) {
+        if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        User user = userService.getUserByToken(token);
+        String email = authentication.getName();
+        Optional<User> optUser = userService.getUserByEmail(email);
+        if (optUser.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        User user = optUser.get();
         rental.setUser(user);
         Optional<Item> optItem = itemService.getItemById(itemId);
         if (optItem.isEmpty()) {

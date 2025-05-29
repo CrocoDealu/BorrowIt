@@ -11,7 +11,6 @@ import java.util.*;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final Map<String, User> userSessions = new HashMap<>();
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -36,17 +35,5 @@ public class UserService {
 
     public User updateUser(User user) {
         return userRepository.update(user);
-    }
-
-    public void addUserSession(String token, User user) {
-        userSessions.put(token, user);
-    }
-
-    public User getUserByToken(String token) {
-        return userSessions.get(token);
-    }
-
-    public void removeUserSession(String token) {
-        userSessions.remove(token);
     }
 }

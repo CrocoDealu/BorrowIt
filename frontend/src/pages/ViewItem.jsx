@@ -202,12 +202,10 @@ const ViewItem = () => {
                             </div>
                         )}
 
-                        {/* Show rental-specific details if the item is rented */}
                         {rentalInfo && (
                             <div className="rental-info">
                                 <h4> Rental Information</h4>
                                 <div className="meta-item">
-                                    {/*<span className="meta-label">Current Renter:</span>*/}
                                     <span className="meta-value">{rentalInfo.renterName}</span>
                                 </div>
                                 <div className="meta-item">
@@ -227,7 +225,6 @@ const ViewItem = () => {
                                 Back
                             </button>
 
-                            {/* Conditional Buttons Based on Type */}
                             {type === "owner" && (
                                 <button
                                     onClick={() => navigate(`/edit-item/${id}`)}

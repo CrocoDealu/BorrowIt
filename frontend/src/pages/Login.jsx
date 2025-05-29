@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
+import {GoogleLogin} from "@react-oauth/google";
 
 const Login = ({ setIsAuthenticated }) => {
     const [email, setEmail] = useState('');
@@ -36,6 +37,10 @@ const Login = ({ setIsAuthenticated }) => {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
     };
 
     return (
@@ -80,6 +85,19 @@ const Login = ({ setIsAuthenticated }) => {
                     </button>
                 </form>
 
+                <div style={{ textAlign: 'center', margin: '16px 0' }}>
+                    <span style={{ color: '#888' }}>or</span>
+                </div>
+                <div className="google-login-container">
+                    <div
+                        id="customBtn"
+                        onClick={handleGoogleLogin}
+                        className="google-login-button"
+                    >
+                        <span className="icon"></span>
+                        <span className="buttonText">Sign in with Google</span>
+                    </div>
+                </div>
                 <div className="login-footer">
                     <p>Don't have an account? <a href="/register">Sign Up</a></p>
                     <a href="/forgot-password" className="forgot-password">Forgot Password?</a>

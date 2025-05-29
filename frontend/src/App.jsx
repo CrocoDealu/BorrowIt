@@ -8,6 +8,7 @@ import axios from 'axios';
 import LentItems from "./pages/LentItems.jsx";
 import ViewItem from "./pages/ViewItem.jsx";
 import BorrowedItems from "./pages/BorrowedItems.jsx";
+import OAuthRedirectHandler from "./pages/OAuthRedirectHandler.jsx";
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/register" element={
                     !isAuthenticated ? <Register /> : <Navigate to="/login" />
                 } />
+
                 <Route path="/dashboard" element={
                     isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
                 } />
@@ -68,6 +70,7 @@ function App() {
                 <Route path="/borrowed-items" element={
                     isAuthenticated ? <BorrowedItems/> : <Navigate to="/login" />
                 } />
+                <Route path="/oauth2/redirect" element={<OAuthRedirectHandler />} />
                 <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />
             </Routes>
         </Router>
